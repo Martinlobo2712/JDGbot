@@ -2,9 +2,9 @@ import os
 import lightbulb
 import hikari
 
-import dotenv
+from dotenv import load_dotenv
 
-dotenv.load_dotenv()
+load_dotenv()
 
 bot = lightbulb.BotApp(
     os.environ["TOKEN"],
@@ -17,6 +17,7 @@ bot = lightbulb.BotApp(
 async def ready_listener(_):
     print("The bot is ready!")
 
+bot.load_extensions("extensions.valo")
 
 @bot.command()
 @lightbulb.command("ping", "Checks that the bot is alive")
