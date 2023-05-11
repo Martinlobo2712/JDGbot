@@ -12,7 +12,7 @@ plugin = lightbulb.Plugin("Valorant Plugin")
 
 client = valorant.Client(
     os.environ["VALORANT_KEY"],
-    locale=None
+    locale="en-US"
 )
 
 class MyNavButton(nav.NavButton):
@@ -37,7 +37,7 @@ class MyNavButton(nav.NavButton):
 @plugin.command
 @lightbulb.command("skins", "shows skins")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def playerInfo(ctx: lightbulb.Context):
+async def showSkins(ctx: lightbulb.Context):
     embeds = []
     skins = client.get_skins()
 
