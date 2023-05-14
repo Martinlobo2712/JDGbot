@@ -1,18 +1,17 @@
-import lightbulb
-import hikari
-import valorant
-import os
-import miru
+import lightbulb, hikari, valorant, os, miru, json
 from miru.ext import nav
 from dotenv import load_dotenv
 
 load_dotenv()
 
+with open("extensions/valorantData.json") as f:
+    data = json.load(f)
+
 plugin = lightbulb.Plugin("Valorant Plugin")
 
 client = valorant.Client(
     os.environ["VALORANT_KEY"],
-    locale="en-US"
+    locale=None
 )
 
 class MyNavButton(nav.NavButton):
@@ -40,9 +39,20 @@ class MyNavButton(nav.NavButton):
 async def showSkins(ctx: lightbulb.Context):
     embeds = []
     skins = client.get_skins()
+    skinsData = data["skins"]
+    maxIdx = len(skinsData)
 
-    for skin in skins:
-        embeds.append(hikari.Embed(title="Skins", description=f"{skin.name}")) 
+
+    for idx, skin in enumerate(skins):
+        embed = hikari.Embed(title="Skins", description=f"{skin.name}")
+        
+        if(not idx > maxIdx-1):
+            skinData = skinsData[idx]
+
+            embed.set_image(skinData["url"])
+            embed.color = skinData["color"]
+
+        embeds.append(embed) 
         
     # Define our navigator and pass in our list of pages
     navigator = nav.NavigatorView(pages=embeds)
