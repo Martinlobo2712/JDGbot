@@ -4,15 +4,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+loadable = False;
+
 with open("extensions/valorantData.json") as f:
     data = json.load(f)
 
 plugin = lightbulb.Plugin("Valorant Plugin")
 
-client = valorant.Client(
-    os.environ["VALORANT_KEY"],
-    locale=None
-)
+try:
+    client = valorant.Client(
+        os.environ["VALORANT_KEY"],
+        locale=None
+    )
+
+    loadable = True;
+except:
+    print("Unusable key")
 
 class MyNavButton(nav.NavButton):
     # This is how you can create your own navigator button
@@ -38,26 +45,30 @@ class MyNavButton(nav.NavButton):
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def showSkins(ctx: lightbulb.Context):
     embeds = []
-    skins = client.get_skins()
-    skinsData = data["skins"]
-    maxIdx = len(skinsData)
+
+    if(loadable):
+        skins = client.get_skins()
+        skinsData = data["skins"]
+        maxIdx = len(skinsData)
 
 
-    for idx, skin in enumerate(skins):
-        embed = hikari.Embed(title="Skins", description=f"{skin.name}")
-        
-        if(not idx > maxIdx-1):
-            skinData = skinsData[idx]
+        for idx, skin in enumerate(skins):
+            embed = hikari.Embed(title="Skins", description=f"{skin.name}")
+            
+            if(not idx > maxIdx-1):
+                skinData = skinsData[idx]
 
-            embed.set_image(skinData["url"])
-            embed.color = skinData["color"]
+                embed.set_image(skinData["url"])
+                embed.color = skinData["color"]
 
-        embeds.append(embed) 
-        
-    # Define our navigator and pass in our list of pages
-    navigator = nav.NavigatorView(pages=embeds)
-    # You may also pass an interaction object to this function
-    await navigator.send(ctx.channel_id)
+            embeds.append(embed) 
+            
+        # Define our navigator and pass in our list of pages
+        navigator = nav.NavigatorView(pages=embeds)
+        # You may also pass an interaction object to this function
+        await navigator.send(ctx.channel_id)
+    else:
+        await ctx.respond("An error has occurred, try again later!")
 
 def load(bot: lightbulb.BotApp) -> None:
   bot.add_plugin(plugin)
